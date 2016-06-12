@@ -1,9 +1,7 @@
 package funsets
 
-import org.scalatest.FunSuite
-
-
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 /**
@@ -29,10 +27,10 @@ class FunSetSuite extends FunSuite {
   /**
     * Tests are written using the "test" operator and the "assert" method.
     */
-  // test("string take") {
-  //   val message = "hello, world"
-  //   assert(message.take(5) == "hello")
-  // }
+  test("string take") {
+    val message = "hello, world"
+    assert(message.take(5) == "hello")
+  }
 
   /**
     * For ScalaTest tests, there exists a special equality operator "===" that
@@ -43,9 +41,9 @@ class FunSetSuite extends FunSuite {
     * Try it out! Change the values so that the assertion fails, and look at the
     * error message.
     */
-  // test("adding ints") {
-  //   assert(1 + 2 === 3)
-  // }
+  test("adding ints") {
+    assert(1 + 2 === 3)
+  }
 
 
   import FunSets._
@@ -97,7 +95,8 @@ class FunSetSuite extends FunSuite {
         * The string argument of "assert" is a message that is printed in case
         * the test fails. This helps identifying which assertion failed.
         */
-      assert(contains(s1, 1), "Singleton")
+      assert(contains(s1, 1), "Singleton s1 contains 1")
+      assert(!contains(s2, 1), "Singleton s2 doesn't contains 1")
     }
   }
 
@@ -107,6 +106,67 @@ class FunSetSuite extends FunSuite {
       assert(contains(s, 1), "Union 1")
       assert(contains(s, 2), "Union 2")
       assert(!contains(s, 3), "Union 3")
+    }
+  }
+
+  test("intersect contains only intersecting elements of each set") {
+    new TestSets {
+      val s = intersect(s1, s2)
+      assert(!contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+      assert(!contains(s, 3), "Intersect 3")
+      val ss = intersect(s1, union(s1, s3))
+      assert(contains(ss, 1), "Intersect ss 1")
+      assert(!contains(ss, 2), "Intersect ss 2")
+      assert(!contains(ss, 3), "Intersect ss 3")
+    }
+  }
+
+  test("diff will find difference of 2 sets") {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(!contains(diff(s, s1), 1), "s - s1 will return s2 and not contain s1")
+      assert(contains(diff(s, s1), 2), "s - s1 will return s2 singleton")
+    }
+  }
+
+  test("filter numbers > 1") {
+    new TestSets {
+      val s = union(s1, union(s2, s3))
+      val ss = filter(s, x => x > 1)
+      assert(contains(s, 1), "filter numbers > 1 - original set 1")
+      assert(contains(s, 2), "filter numbers > 1 - original set 2")
+      assert(contains(s, 3), "filter numbers > 1 - original set 3")
+      assert(!contains(ss, 1), "filter numbers > 1 - test 1")
+      assert(contains(ss, 2), "filter numbers > 1 - test 2")
+      assert(contains(ss, 3), "filter numbers > 1 - test 3")
+    }
+  }
+
+  test("forall numbers > 0") {
+    new TestSets {
+      val s = union(s1, union(s2, s3))
+      assert(forall(s, x => x > 0), "forall numbers > 0")
+    }
+  }
+
+  test("exists numbers > 2") {
+    new TestSets {
+      val s = union(s1, union(s2, s3))
+      assert(exists(s, x => x > 2), "ecists numbers > 2")
+    }
+  }
+
+  test("map by adding 5") {
+    new TestSets {
+      val f = (x: Int) => x + 5
+      val s = union(union(s1, s2), s3)
+      assert(!contains(map(s, f), 1), "map with add 5 - test case 1")
+      assert(!contains(map(s, f), 2), "map with add 5 - test case 2")
+      assert(!contains(map(s, f), 3), "map with add 5 - test case 3")
+      assert(contains(map(s, f), 6), "map with add 5 - test case 4")
+      assert(contains(map(s, f), 7), "map with add 5 - test case 5")
+      assert(contains(map(s, f), 8), "map with add 5 - test case 6")
     }
   }
 
